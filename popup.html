@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #1e1e2e;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+    }
+
+    #addbar-input {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 18px;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border: none;
+      outline: none;
+      border-bottom: 1px solid #313244;
+    }
+
+    #addbar-input::placeholder {
+      color: #6c7086;
+    }
+
+    #addbar-results {
+      list-style: none;
+      padding: 4px 0;
+      max-height: calc(100vh - 55px);
+      overflow-y: auto;
+    }
+
+    .addbar-result {
+      padding: 10px 20px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-left: 3px solid transparent;
+    }
+
+    .addbar-result.selected {
+      background: #313244;
+      border-left-color: #89b4fa;
+    }
+
+    .addbar-title {
+      color: #cdd6f4;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .addbar-url {
+      color: #6c7086;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #addbar-results::-webkit-scrollbar { width: 6px; }
+    #addbar-results::-webkit-scrollbar-track { background: transparent; }
+    #addbar-results::-webkit-scrollbar-thumb { background: #45475a; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <input id="addbar-input" type="text" placeholder="Search history..." autocomplete="off" spellcheck="false" />
+  <ul id="addbar-results"></ul>
+  <script src="popup.js"></script>
+</body>
+</html>
