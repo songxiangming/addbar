@@ -3,7 +3,7 @@
   "name": "AddBar",
   "version": "1.0.0",
   "description": "Fuzzy search browser history with a keyboard shortcut overlay",
-  "permissions": ["history", "tabs"],
+  "permissions": ["history", "tabs", "tabGroups", "storage"],
   "background": {
     "service_worker": "background.js"
   },
@@ -14,6 +14,13 @@
         "mac": "Command+Shift+Space"
       },
       "description": "Toggle AddBar history search overlay"
+    },
+    "open-workspace": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Open workspace restore popup"
     }
   }
 }
