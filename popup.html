@@ -37,9 +37,24 @@
       padding: 10px 20px;
       cursor: pointer;
       display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      border-left: 3px solid transparent;
+    }
+
+    .addbar-indicator {
+      color: #89b4fa;
+      font-size: 10px;
+      flex-shrink: 0;
+      width: 12px;
+    }
+
+    .addbar-text {
+      display: flex;
       flex-direction: column;
       gap: 2px;
-      border-left: 3px solid transparent;
+      min-width: 0;
     }
 
     .addbar-result.selected {

@@ -4,6 +4,7 @@
 (function () {
   const params = new URLSearchParams(window.location.search);
   const originTabId = parseInt(params.get('tabId'), 10);
+  const originWindowId = parseInt(params.get('windowId'), 10);
 
   const input = document.getElementById('addbar-input');
   const resultsList = document.getElementById('addbar-results');
@@ -11,6 +12,16 @@
   let selectedIndex = -1;
   let results = [];
   let debounceTimer = null;
+  const openTabs = new Map(); // url → tabId
+
+  // Query open tabs in the original window
+  if (originWindowId) {
+    chrome.tabs.query({ windowId: originWindowId }, (tabs) => {
+      for (const tab of tabs) {
+        if (tab.url) openTabs.set(tab.url, tab.id);
+      }
+    });
+  }
 
   input.focus();
 
@@ -111,12 +122,18 @@
   }
 
   function navigateAndClose(url) {
-    if (originTabId) {
+    const existingTabId = openTabs.get(url);
+    if (existingTabId) {
+      chrome.tabs.update(existingTabId, { active: true }, () => {
+        chrome.windows.update(originWindowId, { focused: true }, () => {
+          window.close();
+        });
+      });
+    } else if (originTabId) {
       chrome.tabs.update(originTabId, { url }, () => {
         window.close();
       });
     } else {
-      // Fallback: open in a new tab
       chrome.tabs.create({ url }, () => {
         window.close();
       });
@@ -130,6 +147,18 @@
       const li = document.createElement('li');
       li.className = 'addbar-result' + (index === selectedIndex ? ' selected' : '');
 
+      const isOpen = openTabs.has(item.url);
+
+      if (isOpen) {
+        const indicator = document.createElement('span');
+        indicator.className = 'addbar-indicator';
+        indicator.textContent = '◆';
+        li.appendChild(indicator);
+      }
+
+      const textWrap = document.createElement('div');
+      textWrap.className = 'addbar-text';
+
       const titleSpan = document.createElement('span');
       titleSpan.className = 'addbar-title';
       titleSpan.textContent = item.title || item.url;
@@ -138,8 +167,9 @@
       urlSpan.className = 'addbar-url';
       urlSpan.textContent = item.url;
 
-      li.appendChild(titleSpan);
-      li.appendChild(urlSpan);
+      textWrap.appendChild(titleSpan);
+      textWrap.appendChild(urlSpan);
+      li.appendChild(textWrap);
 
       li.addEventListener('click', () => {
         navigateAndClose(item.url);

@@ -16,17 +16,11 @@ No build step, no dependencies. Pure JS + Chrome Extension APIs.
 
 ## Architecture
 
-Two UI paths, one search engine:
+Single popup-based UI: `background.js` receives hotkey command → opens `popup.html` as a centered popup window → `popup.js` calls `chrome.history` directly (extension pages have full API access) → navigates the original tab via `chrome.tabs.update()`.
 
-1. **Content script path** (normal pages): `background.js` receives hotkey command → messages `content.js` → content.js shows Shadow DOM overlay → sends search queries back to background.js (content scripts can't access `chrome.history`) → renders results
-2. **Popup fallback path** (chrome://, blank tabs): `background.js` catches failed `sendMessage` → opens `popup.html` window → `popup.js` calls `chrome.history` directly (extension pages have full API access) → navigates the original tab via `chrome.tabs.update()`
-
-**Fuzzy search** (in `background.js:handleSearch` and duplicated in `popup.js:searchHistory`): space-delimited tokens, ALL must match in title or URL. Scoring weights title matches 2x over URL, penalizes long URLs, boosts visit count.
+**Fuzzy search** (in `popup.js:searchHistory`): space-delimited tokens, ALL must match in title or URL. Scoring weights title matches 2x over URL, penalizes long URLs, boosts visit count.
 
 ## Key Constraints
 
-- Content scripts cannot access `chrome.history` — all history queries go through message passing to the service worker, except in `popup.js` which runs as an extension page
-- Shadow DOM (closed mode) in `content.js` isolates overlay styles — overlay CSS lives in `getOverlayStyles()`, not in `styles.css`
-- `styles.css` only styles the host element in the main document
-- MV3 service workers can go dormant; `chrome.commands` and `chrome.runtime.onMessage` listeners wake them
-- `return true` is required in `onMessage` handlers with async responses
+- MV3 service workers can go dormant; `chrome.commands` listeners wake them
+- The popup receives the originating tab ID via query param (`?tabId=`), uses `chrome.tabs.update()` to navigate that tab
